@@ -1,0 +1,6 @@
+{
+  "name": "AWE SPA - Ancestral Wellness Experience",
+  "description": "Luxury holistic spa booking & client health intake system with real-time therapist calendar synchronization and customized session management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
