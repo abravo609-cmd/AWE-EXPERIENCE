@@ -30,7 +30,7 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-white">
-            Lissett Morante
+            Lisett Morante
           </h2>
 
           <p className="text-sm sm:text-base text-[#ebd8b1] font-serif italic">
@@ -49,7 +49,7 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
               className="px-6 py-3 rounded-xl bg-[#c5a059] hover:bg-[#b5924d] text-[#1e1c1a] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2"
             >
               <Calendar className="w-4 h-4" />
-              <span>{lang === 'es' ? 'Reservar Cita con Lissett' : 'Book a Session'}</span>
+              <span>{lang === 'es' ? 'Reservar Cita con Lisett' : 'Book a Session'}</span>
             </button>
 
             <a
@@ -159,7 +159,7 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#faf7f2] border border-[#ede5d8] hover:bg-[#ede5d8] transition-colors"
           >
             <Instagram className="w-4 h-4 text-[#8e5d43]" />
-            <span>@lissettmorante.awe</span>
+            <span>@lisettmorante.awe</span>
           </a>
         </div>
       </div>

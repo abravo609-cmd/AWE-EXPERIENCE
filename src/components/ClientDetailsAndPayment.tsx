@@ -94,8 +94,8 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
         </h2>
         <p className="text-sm text-[#615a51] mt-1 font-light leading-relaxed">
           {lang === 'es'
-            ? 'Para garantizar la exclusividad de tu espacio sagrado con Lissett Morante, requerimos el 50% de abono de confirmación. Tu cita se sincronizará automáticamente con el calendario de la terapeuta.'
-            : 'To secure your sacred sanctuary appointment with Lissett Morante, a 50% confirmation deposit is required. Your appointment will sync to the therapist calendar.'}
+            ? 'Para garantizar la exclusividad de tu espacio sagrado con Lisett Morante, requerimos el 50% de abono de confirmación. Tu cita se sincronizará automáticamente con el calendario de la terapeuta.'
+            : 'To secure your sacred sanctuary appointment with Lisett Morante, a 50% confirmation deposit is required. Your appointment will sync to the therapist calendar.'}
         </p>
       </div>
 
@@ -293,10 +293,10 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
                 <p className="font-semibold text-[#415344] mb-1">
                   {lang === 'es' ? 'Datos bancarios para transferencia (Ecuador):' : 'Bank transfer coordinates:'}
                 </p>
-                <p>• <strong>Banco:</strong> Banco Pichincha (Cta Corriente: 2100849204)</p>
-                <p>• <strong>Titular:</strong> Lissett Morante — AWE SPA</p>
-                <p>• <strong>RUC / CI:</strong> 0924881029001</p>
-                <p>• <strong>Monto de abono:</strong> ${depositAmount} USD</p>
+                <p>• <strong>{lang === 'es' ? 'Banco:' : 'Bank:'}</strong> Banco Pichincha ({lang === 'es' ? 'Cta Ahorros:' : 'Savings Acc:'} 2203426509)</p>
+                <p>• <strong>{lang === 'es' ? 'Titular:' : 'Account Holder:'}</strong> Lisett Morante Morales</p>
+                <p>• <strong>RUC / CI:</strong> 0927358887001</p>
+                <p>• <strong>{lang === 'es' ? 'Monto de abono (50%):' : 'Deposit Amount (50%):'}</strong> ${depositAmount} USD</p>
                 <p className="text-[11px] text-[#8e5d43] mt-1 italic">
                   {lang === 'es'
                     ? 'Envía el comprobante a WhatsApp (+593 99 058 7684) para validación automática.'
@@ -327,8 +327,8 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
                 </p>
                 <p>
                   {lang === 'es'
-                    ? 'La terapeuta Lissett Morante se pondrá en contacto contigo para verificar la disponibilidad y coordinar la recepción del anticipo.'
-                    : 'Therapist Lissett Morante will contact you to coordinate deposit verification.'}
+                    ? 'La terapeuta Lisett Morante se pondrá en contacto contigo para verificar la disponibilidad y coordinar la recepción del anticipo.'
+                    : 'Therapist Lisett Morante will contact you to coordinate deposit verification.'}
                 </p>
               </div>
             )}

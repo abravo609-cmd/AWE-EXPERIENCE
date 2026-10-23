@@ -77,7 +77,7 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c5a059]/20 text-[#ebd8b1] text-xs font-semibold tracking-wider uppercase mb-2 border border-[#c5a059]/30">
-              <span>✦ Agenda de la Terapeuta</span> · <span>Lissett Morante</span>
+              <span>✦ Agenda de la Terapeuta</span> · <span>Lisett Morante</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">
               {lang === 'es' ? 'Gestión de Citas & Fichas Clínicas' : 'Therapist Calendar & Health Cards'}
@@ -119,7 +119,7 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
             <span className="text-[#ebd8b1] font-medium">
               {hasGoogleSync
                 ? lang === 'es'
-                  ? 'Sincronización activa con Google Calendar de Lissett Morante'
+                  ? 'Sincronización activa con Google Calendar de Lisett Morante'
                   : 'Active real-time synchronization with Google Calendar'
                 : lang === 'es'
                 ? 'Modo local (Inicia sesión con Google para sincronizar en tiempo real)'
@@ -307,7 +307,7 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                     <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#e8dfd3]">
                       <h5 className="text-xs font-bold text-[#8e5d43] uppercase tracking-wider flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5 text-[#c5a059]" />
-                        Ficha Médica & Perfil del Cliente (Lissett Morante)
+                        Ficha Médica & Perfil del Cliente (Lisett Morante)
                       </h5>
                       <div className="flex items-center gap-3 text-[11px] text-[#7d7468]">
                         <span>Fecha Ficha: {ha.intakeDate || res.date}</span>

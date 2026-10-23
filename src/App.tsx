@@ -484,7 +484,7 @@ export default function App() {
           />
         )}
 
-        {/* Tab 4: About Lissett Morante */}
+        {/* Tab 4: About Lisett Morante */}
         {currentTab === 'about' && (
           <AboutTherapistView
             lang={lang}
@@ -520,7 +520,7 @@ export default function App() {
                 ✦ ANCESTRAL WELLNESS EXPERIENCE ✦
               </span>
               <h3 className="text-2xl font-serif font-bold text-white mt-1">
-                LISSETT MORANTE
+                LISETT MORANTE
               </h3>
               <p className="text-xs text-[#a89e90]">
                 Spa & Holistic Wellness · Ecuador 2026
@@ -542,13 +542,13 @@ export default function App() {
                   +593 99 058 7684
                 </a>
               </p>
-              <p className="text-[#a89e90]">Instagram: @lissettmorante.awe</p>
+              <p className="text-[#a89e90]">Instagram: @lisettmorante.awe</p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8e8477]">
             <p>
-              © {new Date().getFullYear()} AWE SPA · Lissett Morante. Todos los derechos reservados.
+              © {new Date().getFullYear()} AWE SPA · Lisett Morante. Todos los derechos reservados.
             </p>
             <div className="flex items-center gap-4">
               <span>Abono de confirmación 50%</span>

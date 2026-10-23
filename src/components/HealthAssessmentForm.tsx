@@ -107,7 +107,7 @@ export const HealthAssessmentForm: React.FC<HealthAssessmentFormProps> = ({
       labelEs: 'Problemas en la columna (hernias, escoliosis, lumbalgia)',
       labelEn: 'Spinal problems (hernias, scoliosis, disc issues)',
       warning: true,
-      alertNote: 'Lissett adaptará la alineación postural y quirotermia descontracturante.',
+      alertNote: 'Lisett adaptará la alineación postural y quirotermia descontracturante.',
     },
     {
       key: 'recentMuscleInjuries' as const,
@@ -944,8 +944,8 @@ export const HealthAssessmentForm: React.FC<HealthAssessmentFormProps> = ({
         <div>
           <label className="text-xs font-semibold text-[#5a534b] uppercase tracking-wider block mb-1.5">
             {lang === 'es'
-              ? 'Detalles o peticiones especiales para Lissett Morante:'
-              : 'Special notes or requests for Lissett:'}
+              ? 'Detalles o peticiones especiales para Lisett Morante:'
+              : 'Special notes or requests for Lisett:'}
           </label>
           <textarea
             rows={2}

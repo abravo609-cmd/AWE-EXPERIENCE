@@ -38,7 +38,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-serif font-bold text-white tracking-tight">
-            LISSETT MORANTE
+            LISETT MORANTE
           </h1>
           <p className="text-sm font-medium tracking-[0.2em] text-[#ecd7ab] uppercase">
             Spa & Holistic Wellness
@@ -478,9 +478,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
         {/* Footer Signature */}
         <div className="text-center pt-4 border-t border-[#e2d7c5] space-y-1">
-          <p className="font-serif font-bold text-lg text-[#2d2a26]">Lissett Morante</p>
+          <p className="font-serif font-bold text-lg text-[#2d2a26]">Lisett Morante</p>
           <p className="text-xs text-[#8e5d43] tracking-widest uppercase">Ancestral Wellness Experience</p>
-          <p className="text-xs text-[#6e665d]">@lissettmorante.awe · +593 99 058 7684 · Ecuador 2026</p>
+          <p className="text-xs text-[#6e665d]">@lisettmorante.awe · +593 99 058 7684 · Ecuador 2026</p>
           <p className="font-serif italic text-sm text-[#415344] mt-2">
             "Donde la sabiduría ancestral sana el ser moderno."
           </p>

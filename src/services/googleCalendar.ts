@@ -83,7 +83,7 @@ export const createTherapistEvent = async (
 
   const description = [
     `✦ AWE SPA — ANCESTRAL WELLNESS EXPERIENCE ✦`,
-    `Therapist: Lissett Morante · Ecuador (+593 99 058 7684)`,
+    `Therapist: Lisett Morante · Ecuador (+593 99 058 7684)`,
     `"Tu cuerpo recuerda lo que tu mente olvidó."`,
     ``,
     `📅 CLIENT APPOINTMENT DETAILS:`,

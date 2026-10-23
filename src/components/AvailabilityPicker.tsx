@@ -167,8 +167,8 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
         </h2>
         <p className="text-sm text-[#615a51] mt-1 font-light leading-relaxed">
           {lang === 'es'
-            ? `Lissett Morante atiende citas de manera exclusiva y personalizada. La sesión seleccionada requiere ${durationMinutes} minutos de atención continua.`
-            : `Lissett Morante provides one-on-one exclusive care. Your ritual requires ${durationMinutes} minutes of uninterrupted presence.`}
+            ? `Lisett Morante atiende citas de manera exclusiva y personalizada. La sesión seleccionada requiere ${durationMinutes} minutos de atención continua.`
+            : `Lisett Morante provides one-on-one exclusive care. Your ritual requires ${durationMinutes} minutes of uninterrupted presence.`}
         </p>
       </div>
 

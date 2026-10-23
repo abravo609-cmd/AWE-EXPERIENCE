@@ -33,10 +33,10 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
 
   const ha = reservation.healthAssessment;
 
-  // WhatsApp text message formatted for Lissett Morante
+  // WhatsApp text message formatted for Lisett Morante
   const waMessage = encodeURIComponent(
     `✦ *RESERVA EN AWE SPA* ✦\n` +
-      `¡Hola Lissett! Acabo de registrar mi cita y ficha de salud:\n\n` +
+      `¡Hola Lisett! Acabo de registrar mi cita y ficha de salud:\n\n` +
       `• *Cliente:* ${reservation.clientName}\n` +
       (ha.idNumber ? `• *Cédula/ID:* ${ha.idNumber}\n` : '') +
       (ha.emergencyContact ? `• *Contacto Emergencia:* ${ha.emergencyContact} (${ha.emergencyPhoneNumber})\n` : '') +
@@ -83,8 +83,8 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
 
           <p className="text-xs sm:text-sm text-[#e0ded8] leading-relaxed">
             {lang === 'es'
-              ? `Tu cita ha sido agendada para el ${reservation.date} a las ${reservation.timeSlot}. El espacio ha sido reservado para tu experiencia con Lissett Morante.`
-              : `Your session is booked for ${reservation.date} at ${reservation.timeSlot}. The sanctuary space is prepared for your time with Lissett Morante.`}
+              ? `Tu cita ha sido agendada para el ${reservation.date} a las ${reservation.timeSlot}. El espacio ha sido reservado para tu experiencia con Lisett Morante.`
+              : `Your session is booked for ${reservation.date} at ${reservation.timeSlot}. The sanctuary space is prepared for your time with Lisett Morante.`}
           </p>
 
           {/* Sync badge */}
@@ -170,13 +170,23 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
                 </span>
               </div>
             </div>
+
+            {reservation.paymentMethod === 'transfer' && (
+              <div className="pt-3 border-t border-[#f0eae1] text-xs text-[#4a453e] space-y-0.5 bg-[#faf7f2] p-3 rounded-xl">
+                <p className="font-bold text-[#415344]">
+                  {lang === 'es' ? 'Datos de Transferencia — Banco Pichincha:' : 'Bank Transfer Details — Pichincha Bank:'}
+                </p>
+                <p>• <strong>{lang === 'es' ? 'Banco:' : 'Bank:'}</strong> Banco Pichincha ({lang === 'es' ? 'Cta Ahorros:' : 'Savings Acc:'} 2203426509)</p>
+                <p>• <strong>{lang === 'es' ? 'Titular:' : 'Holder:'}</strong> Lisett Morante Morales · <strong>RUC / CI:</strong> 0927358887001</p>
+              </div>
+            )}
           </div>
 
           {/* Clinical Health Snapshot */}
           <div className="bg-[#faf7f2] p-5 rounded-2xl border border-[#ede5d8] space-y-3">
             <h4 className="text-xs font-bold text-[#8e5d43] uppercase tracking-wider flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-[#415344]" />
-              {lang === 'es' ? 'Ficha de Salud Registrada para Lissett Morante' : 'Client Health Assessment Attached'}
+              {lang === 'es' ? 'Ficha de Salud Registrada para Lisett Morante' : 'Client Health Assessment Attached'}
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">

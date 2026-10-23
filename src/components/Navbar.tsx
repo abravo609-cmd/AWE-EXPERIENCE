@@ -54,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <div className="flex items-center gap-4 text-xs">
             <a
-              href="https://wa.me/593990587684?text=Hola%20Lissett,%20deseo%20informaci%C3%B3n%20sobre%20las%20sesiones%20en%20AWE%20SPA"
+              href="https://wa.me/593990587684?text=Hola%20Lisett,%20deseo%20informaci%C3%B3n%20sobre%20las%20sesiones%20en%20AWE%20SPA"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-[#c5a059] transition-colors"
@@ -93,7 +93,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-[10px] text-[#c5a059]">✦</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#2d2a26] tracking-tight leading-none group-hover:text-[#415344] transition-colors">
-                Lissett Morante
+                Lisett Morante
               </h1>
               <p className="text-[11px] text-[#6b645b] font-medium tracking-wider">
                 Spa & Holistic Wellness
@@ -151,7 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <UserCheck className="w-4 h-4 text-[#c5a059]" />
-              <span>{lang === 'es' ? 'Lissett Morante' : 'About'}</span>
+              <span>{lang === 'es' ? 'Lisett Morante' : 'About'}</span>
             </button>
           </nav>
 
@@ -259,7 +259,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : 'bg-[#f0eae1] text-[#4a453e]'
             }`}
           >
-            Lissett
+            Lisett
           </button>
         </div>
       </div>
