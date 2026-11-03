@@ -1,3 +1,13 @@
+export type Lang = 'es' | 'en';
+
+export type Tab = 'book' | 'catalog' | 'agenda' | 'about';
+
+export type BookingStep = 1 | 2 | 3 | 4;
+
+export type PaymentMethod = 'cash' | 'transfer' | 'card';
+
+export type PressurePreference = 'gentle' | 'medium' | 'firm' | 'deep';
+
 export type TreatmentCategory =
   | 'all'
   | 'rituales'
@@ -63,6 +73,34 @@ export interface MedicalConditionsChecklist {
   allergiesDetails?: string;
 }
 
+export type MedicalFlagKey =
+  | 'highBloodPressure'
+  | 'heartProblems'
+  | 'diabetes'
+  | 'circulatoryProblems'
+  | 'thrombosisVaricose'
+  | 'epilepsy'
+  | 'asthma'
+  | 'respiratoryProblems'
+  | 'spinalProblems'
+  | 'recentMuscleInjuries'
+  | 'recentFractures'
+  | 'surgeriesLast12Months'
+  | 'skinConditions'
+  | 'allergies'
+  | 'pregnancy'
+  | 'breastfeeding'
+  | 'cancerHistory'
+  | 'currentMedications'
+  | 'pacemakerDevices'
+  | 'otherConditions';
+
+export type MedicalDetailsKey =
+  | 'otherConditionsDetails'
+  | 'medicationsDetails'
+  | 'surgeriesDetails'
+  | 'allergiesDetails';
+
 export interface HealthAssessment {
   // Form Date & Client Demographics
   intakeDate: string;
@@ -110,7 +148,7 @@ export interface HealthAssessment {
   // Focus & Avoid Body Areas
   focusAreas: string[];
   avoidAreas: string[];
-  pressurePreference: 'gentle' | 'medium' | 'firm' | 'deep';
+  pressurePreference: PressurePreference;
 
   // Energy & Emotional Intention
   energyIntention: string;
@@ -131,7 +169,7 @@ export interface BookingReservation {
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  paymentMethod: 'cash' | 'transfer' | 'card';
+  paymentMethod: PaymentMethod;
   healthAssessment: HealthAssessment;
   calendarEventId?: string;
   createdAt: string;

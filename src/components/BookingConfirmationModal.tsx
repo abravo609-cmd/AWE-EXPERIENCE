@@ -1,24 +1,23 @@
 import React from 'react';
-import { BookingReservation } from '../types/spa';
+import { BookingReservation, Lang } from '../types/spa';
+import { BRAND, whatsappUrl } from '../data/brand';
+import { BankTransferLines } from './ui';
 import {
   CheckCircle2,
   Calendar,
   Clock,
   User,
   ShieldCheck,
-  ExternalLink,
   MessageCircle,
-  FileText,
   X,
-  Share2,
   AlertTriangle,
 } from 'lucide-react';
 
 interface BookingConfirmationModalProps {
-  lang: 'es' | 'en';
+  lang: Lang;
   reservation: BookingReservation | null;
   onClose: () => void;
-  onViewAgenda: () => void;
+  onViewAgenda?: () => void;
   hasGoogleSync: boolean;
 }
 
@@ -34,25 +33,28 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
   const ha = reservation.healthAssessment;
 
   // WhatsApp text message formatted for Lisett Morante
-  const waMessage = encodeURIComponent(
-    `✦ *RESERVA EN AWE SPA* ✦\n` +
-      `¡Hola Lisett! Acabo de registrar mi cita y ficha de salud:\n\n` +
-      `• *Cliente:* ${reservation.clientName}\n` +
-      (ha.idNumber ? `• *Cédula/ID:* ${ha.idNumber}\n` : '') +
-      (ha.emergencyContact ? `• *Contacto Emergencia:* ${ha.emergencyContact} (${ha.emergencyPhoneNumber})\n` : '') +
-      `• *Tratamiento:* ${reservation.treatmentName} (${reservation.durationMinutes} min)\n` +
-      `• *Fecha:* ${reservation.date}\n` +
-      `• *Hora:* ${reservation.timeSlot}\n` +
-      `• *Abono 50%:* $${reservation.depositRequired} USD (${reservation.paymentMethod.toUpperCase()})\n` +
-      `• *Motivo de visita:* ${ha.visitReasons && ha.visitReasons.length > 0 ? ha.visitReasons.join(', ') : 'Bienestar'}\n` +
-      `• *Zonas a enfocar:* ${ha.focusAreas.join(', ') || 'Equilibrio general'}\n` +
-      (ha.hasRestrictions ? `• *Restricciones:* ${ha.restrictionsDetails}\n` : '') +
-      (ha.isPregnant ? `• *Embarazo:* Sí (${ha.pregnancyWeeks ? `${ha.pregnancyWeeks} semanas` : ''})\n` : '') +
-      (ha.hasAllergies ? `• *Alergias:* ${ha.allergiesList.join(', ')}\n` : '') +
-      `\nAdjunto mi comprobante para confirmar mi espacio sagrado. ¡Gracias!`
-  );
+  const waMessage =
+    `✦ *RESERVA EN ${BRAND.name}* ✦\n` +
+    `¡Hola Lisett! Acabo de registrar mi cita y ficha de salud:\n\n` +
+    `• *Cliente:* ${reservation.clientName}\n` +
+    (ha.idNumber ? `• *Cédula/ID:* ${ha.idNumber}\n` : '') +
+    (ha.emergencyContact
+      ? `• *Contacto Emergencia:* ${ha.emergencyContact} (${ha.emergencyPhoneNumber})\n`
+      : '') +
+    `• *Tratamiento:* ${reservation.treatmentName} (${reservation.durationMinutes} min)\n` +
+    `• *Fecha:* ${reservation.date}\n` +
+    `• *Hora:* ${reservation.timeSlot}\n` +
+    `• *Abono 50%:* $${reservation.depositRequired} USD (${reservation.paymentMethod.toUpperCase()})\n` +
+    `• *Motivo de visita:* ${ha.visitReasons && ha.visitReasons.length > 0 ? ha.visitReasons.join(', ') : 'Bienestar'}\n` +
+    `• *Zonas a enfocar:* ${ha.focusAreas.join(', ') || 'Equilibrio general'}\n` +
+    (ha.hasRestrictions ? `• *Restricciones:* ${ha.restrictionsDetails}\n` : '') +
+    (ha.isPregnant
+      ? `• *Embarazo:* Sí (${ha.pregnancyWeeks ? `${ha.pregnancyWeeks} semanas` : ''})\n`
+      : '') +
+    (ha.hasAllergies ? `• *Alergias:* ${ha.allergiesList.join(', ')}\n` : '') +
+    `\nAdjunto mi comprobante para confirmar mi espacio sagrado. ¡Gracias!`;
 
-  const waLink = `https://wa.me/593990587684?text=${waMessage}`;
+  const waLink = whatsappUrl(waMessage);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
@@ -95,8 +97,8 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
                 ? 'Sincronizado en tiempo real con Google Calendar'
                 : 'Synced in real-time to Google Calendar'
               : lang === 'es'
-              ? 'Guardado en la agenda de AWE SPA'
-              : 'Saved in AWE SPA Agenda'}
+                ? 'Guardado en la agenda de AWE SPA'
+                : 'Saved in AWE SPA Agenda'}
           </div>
         </div>
 
@@ -174,10 +176,11 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
             {reservation.paymentMethod === 'transfer' && (
               <div className="pt-3 border-t border-[#f0eae1] text-xs text-[#4a453e] space-y-0.5 bg-[#faf7f2] p-3 rounded-xl">
                 <p className="font-bold text-[#415344]">
-                  {lang === 'es' ? 'Datos de Transferencia — Banco Pichincha:' : 'Bank Transfer Details — Pichincha Bank:'}
+                  {lang === 'es'
+                    ? 'Datos de Transferencia — Banco Pichincha:'
+                    : 'Bank Transfer Details — Pichincha Bank:'}
                 </p>
-                <p>• <strong>{lang === 'es' ? 'Banco:' : 'Bank:'}</strong> Banco Pichincha ({lang === 'es' ? 'Cta Ahorros:' : 'Savings Acc:'} 2203426509)</p>
-                <p>• <strong>{lang === 'es' ? 'Titular:' : 'Holder:'}</strong> Lisett Morante Morales · <strong>RUC / CI:</strong> 0927358887001</p>
+                <BankTransferLines lang={lang} compact />
               </div>
             )}
           </div>
@@ -186,7 +189,9 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
           <div className="bg-[#faf7f2] p-5 rounded-2xl border border-[#ede5d8] space-y-3">
             <h4 className="text-xs font-bold text-[#8e5d43] uppercase tracking-wider flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-[#415344]" />
-              {lang === 'es' ? 'Ficha de Salud Registrada para Lisett Morante' : 'Client Health Assessment Attached'}
+              {lang === 'es'
+                ? 'Ficha de Salud Registrada para Lisett Morante'
+                : 'Client Health Assessment Attached'}
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -217,16 +222,21 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
                   {lang === 'es' ? 'Avisos clínicos para la terapeuta:' : 'Clinical cautions:'}
                 </span>
                 {ha.isPregnant && (
-                  <p>• Embarazo: Sí ({ha.pregnancyWeeks || 'En gestación'}) - Protocolo prenatal activo</p>
+                  <p>
+                    • Embarazo: Sí ({ha.pregnancyWeeks || 'En gestación'}) - Protocolo prenatal
+                    activo
+                  </p>
                 )}
                 {ha.hasAllergies && (
-                  <p>• Alergias: {ha.allergiesList.join(', ')} {ha.otherAllergies}</p>
+                  <p>
+                    • Alergias: {ha.allergiesList.join(', ')} {ha.otherAllergies}
+                  </p>
                 )}
-                {ha.hasRestrictions && (
-                  <p>• Restricción física: {ha.restrictionsDetails}</p>
-                )}
+                {ha.hasRestrictions && <p>• Restricción física: {ha.restrictionsDetails}</p>}
                 {ha.hasSurgeries && (
-                  <p>• Cirugías: {ha.surgeriesDetails} ({ha.surgeriesDate || 'Reciente'})</p>
+                  <p>
+                    • Cirugías: {ha.surgeriesDetails} ({ha.surgeriesDate || 'Reciente'})
+                  </p>
                 )}
               </div>
             )}
@@ -244,26 +254,32 @@ export const BookingConfirmationModal: React.FC<BookingConfirmationModalProps> =
               <MessageCircle className="w-5 h-5" />
               <span>
                 {lang === 'es'
-                  ? 'Confirmar y Enviar Comprobante por WhatsApp (+593 99 058 7684)'
-                  : 'Confirm via WhatsApp (+593 99 058 7684)'}
+                  ? `Confirmar y Enviar Comprobante por WhatsApp (${BRAND.whatsapp.display})`
+                  : `Confirm via WhatsApp (${BRAND.whatsapp.display})`}
               </span>
             </a>
 
             {/* View Agenda Button */}
             <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={onViewAgenda}
-                className="flex-1 py-3 px-4 bg-[#415344] hover:bg-[#344337] text-white font-semibold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors"
-              >
-                <Calendar className="w-4 h-4 text-[#c5a059]" />
-                <span>{lang === 'es' ? 'Ver en la Agenda de AWE SPA' : 'View in Spa Agenda'}</span>
-              </button>
+              {onViewAgenda && (
+                <button
+                  type="button"
+                  onClick={onViewAgenda}
+                  className="flex-1 py-3 px-4 bg-[#415344] hover:bg-[#344337] text-white font-semibold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors"
+                >
+                  <Calendar className="w-4 h-4 text-[#c5a059]" />
+                  <span>
+                    {lang === 'es' ? 'Ver en la Agenda de AWE SPA' : 'View in Spa Agenda'}
+                  </span>
+                </button>
+              )}
 
               <button
                 type="button"
                 onClick={onClose}
-                className="py-3 px-5 bg-white hover:bg-[#ede5d8] border border-[#d8ccbc] text-[#4a453e] font-semibold text-xs sm:text-sm rounded-xl transition-colors"
+                className={`py-3 px-5 bg-white hover:bg-[#ede5d8] border border-[#d8ccbc] text-[#4a453e] font-semibold text-xs sm:text-sm rounded-xl transition-colors ${
+                  onViewAgenda ? '' : 'flex-1'
+                }`}
               >
                 {lang === 'es' ? 'Cerrar' : 'Done'}
               </button>

@@ -1,10 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { TREATMENTS } from '../data/treatments';
-import { Treatment, TreatmentCategory, TreatmentDuration } from '../types/spa';
-import { Clock, Check, Sparkles, Search, ArrowRight, ShieldCheck, HeartHandshake } from 'lucide-react';
+import { Lang, Treatment, TreatmentCategory, TreatmentDuration } from '../types/spa';
+import {
+  Clock,
+  Check,
+  Sparkles,
+  Search,
+  ArrowRight,
+  ShieldCheck,
+  HeartHandshake,
+} from 'lucide-react';
+import { calcDeposit } from '../data/brand';
 
 interface TreatmentPickerProps {
-  lang: 'es' | 'en';
+  lang: Lang;
   selectedTreatment: Treatment | null;
   selectedDuration: TreatmentDuration | null;
   onSelectTreatment: (treatment: Treatment, duration: TreatmentDuration) => void;
@@ -23,11 +32,26 @@ export const TreatmentPicker: React.FC<TreatmentPickerProps> = ({
 
   const categories: { key: TreatmentCategory; labelEs: string; labelEn: string; icon: string }[] = [
     { key: 'all', labelEs: 'Todos los Servicios', labelEn: 'All Services', icon: '✦' },
-    { key: 'rituales', labelEs: 'Rituales de Transformación', labelEn: 'Transformation Rituals', icon: '🌿' },
+    {
+      key: 'rituales',
+      labelEs: 'Rituales de Transformación',
+      labelEn: 'Transformation Rituals',
+      icon: '🌿',
+    },
     { key: 'masajes', labelEs: 'Experiencias Corporales', labelEn: 'Body Massage', icon: '✨' },
-    { key: 'ancestrales', labelEs: 'Terapias Ancestrales & Autor', labelEn: 'Ancestral Therapies', icon: '🔥' },
+    {
+      key: 'ancestrales',
+      labelEs: 'Terapias Ancestrales & Autor',
+      labelEn: 'Ancestral Therapies',
+      icon: '🔥',
+    },
     { key: 'facial', labelEs: 'Bienestar Facial Kobido', labelEn: 'Kobido Facial', icon: '🌸' },
-    { key: 'conexion', labelEs: 'Terapias de Conexión', labelEn: 'Connection Therapies', icon: '👣' },
+    {
+      key: 'conexion',
+      labelEs: 'Terapias de Conexión',
+      labelEn: 'Connection Therapies',
+      icon: '👣',
+    },
   ];
 
   const filteredTreatments = useMemo(() => {
@@ -70,7 +94,9 @@ export const TreatmentPicker: React.FC<TreatmentPickerProps> = ({
             </span>
             <span className="flex items-center gap-1.5">
               <HeartHandshake className="w-4 h-4 text-[#c5a059]" />
-              {lang === 'es' ? 'Abono 50% · Cancela gratis hasta 24h antes' : '50% deposit · Free 24h cancellation'}
+              {lang === 'es'
+                ? 'Abono 50% · Cancela gratis hasta 24h antes'
+                : '50% deposit · Free 24h cancellation'}
             </span>
           </div>
         </div>
@@ -145,7 +171,8 @@ export const TreatmentPicker: React.FC<TreatmentPickerProps> = ({
                       {lang === 'es' ? 'Desde' : 'From'}
                     </span>
                     <span className="text-xl font-bold text-[#415344]">
-                      ${t.durations[0].price} <span className="text-xs font-normal text-[#7d7468]">USD</span>
+                      ${t.durations[0].price}{' '}
+                      <span className="text-xs font-normal text-[#7d7468]">USD</span>
                     </span>
                   </div>
                 </div>
@@ -187,9 +214,6 @@ export const TreatmentPicker: React.FC<TreatmentPickerProps> = ({
                     <Clock className="w-3.5 h-3.5 text-[#8e5d43]" />
                     {lang === 'es' ? 'Elige la duración:' : 'Select duration:'}
                   </span>
-                  <span className="text-[11px] text-[#8e5d43] font-medium">
-                    {lang === 'es' ? '50% abono requerido' : '50% deposit required'}
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-3">
@@ -209,16 +233,20 @@ export const TreatmentPicker: React.FC<TreatmentPickerProps> = ({
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold">
-                            {dur.minutes} min
-                          </span>
-                          <span className={`text-sm font-extrabold ${isDurSelected ? 'text-[#ebd8b1]' : 'text-[#415344]'}`}>
+                          <span className="text-xs font-bold">{dur.minutes} min</span>
+                          <span
+                            className={`text-sm font-extrabold ${isDurSelected ? 'text-[#ebd8b1]' : 'text-[#415344]'}`}
+                          >
                             ${dur.price} USD
                           </span>
                         </div>
                         {dur.savings ? (
-                          <div className={`text-[10px] mt-1 font-medium ${isDurSelected ? 'text-emerald-200' : 'text-emerald-700'}`}>
-                            {lang === 'es' ? `Ahorras $${dur.savings} USD` : `Save $${dur.savings} USD`}
+                          <div
+                            className={`text-[10px] mt-1 font-medium ${isDurSelected ? 'text-emerald-200' : 'text-emerald-700'}`}
+                          >
+                            {lang === 'es'
+                              ? `Ahorras $${dur.savings} USD`
+                              : `Save $${dur.savings} USD`}
                           </div>
                         ) : null}
                       </button>
@@ -259,7 +287,9 @@ export const TreatmentPicker: React.FC<TreatmentPickerProps> = ({
       {filteredTreatments.length === 0 && (
         <div className="text-center py-16 bg-white rounded-2xl border border-[#e4daca]">
           <p className="text-gray-500 text-sm">
-            {lang === 'es' ? 'No se encontraron tratamientos con ese filtro.' : 'No treatments match your search.'}
+            {lang === 'es'
+              ? 'No se encontraron tratamientos con ese filtro.'
+              : 'No treatments match your search.'}
           </p>
           <button
             onClick={() => {
@@ -299,7 +329,7 @@ export const TreatmentPicker: React.FC<TreatmentPickerProps> = ({
                 {lang === 'es' ? 'Abono confirmación (50%)' : '50% confirmation deposit'}
               </span>
               <span className="text-base font-bold text-[#ecd7ab]">
-                ${selectedDuration.price * 0.5} USD
+                ${calcDeposit(selectedDuration.price)} USD
               </span>
             </div>
             <button

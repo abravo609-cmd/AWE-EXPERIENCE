@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import { BookingReservation, GoogleCalendarEvent } from '../types/spa';
+import { BookingReservation, GoogleCalendarEvent, Lang } from '../types/spa';
 import {
   Calendar,
   Clock,
   User,
   Phone,
-  Mail,
-  ShieldAlert,
-  Baby,
-  Activity,
-  Heart,
   RefreshCw,
   Trash2,
   ExternalLink,
@@ -17,11 +12,10 @@ import {
   ChevronUp,
   Sparkles,
   AlertTriangle,
-  CheckCircle,
 } from 'lucide-react';
 
 interface CalendarManagerViewProps {
-  lang: 'es' | 'en';
+  lang: Lang;
   reservations: BookingReservation[];
   calendarEvents: GoogleCalendarEvent[];
   hasGoogleSync: boolean;
@@ -44,7 +38,6 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [reservationToDelete, setReservationToDelete] = useState<BookingReservation | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [filterDate, setFilterDate] = useState<string>('all');
 
   // Handle destructive cancellation with confirmation modal
   const handleConfirmCancel = async () => {
@@ -65,11 +58,6 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
     return da.localeCompare(db);
   });
 
-  const filteredReservations = sortedReservations.filter((r) => {
-    if (filterDate === 'all') return true;
-    return r.date === filterDate;
-  });
-
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Top Header */}
@@ -80,7 +68,9 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
               <span>✦ Agenda de la Terapeuta</span> · <span>Lisett Morante</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">
-              {lang === 'es' ? 'Gestión de Citas & Fichas Clínicas' : 'Therapist Calendar & Health Cards'}
+              {lang === 'es'
+                ? 'Gestión de Citas & Fichas Clínicas'
+                : 'Therapist Calendar & Health Cards'}
             </h2>
             <p className="text-xs sm:text-sm text-[#d8dfd7] mt-1 max-w-2xl font-light">
               {lang === 'es'
@@ -122,8 +112,8 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                   ? 'Sincronización activa con Google Calendar de Lisett Morante'
                   : 'Active real-time synchronization with Google Calendar'
                 : lang === 'es'
-                ? 'Modo local (Inicia sesión con Google para sincronizar en tiempo real)'
-                : 'Local mode (Sign in with Google for cloud calendar sync)'}
+                  ? 'Modo local (Inicia sesión con Google para sincronizar en tiempo real)'
+                  : 'Local mode (Sign in with Google for cloud calendar sync)'}
             </span>
           </div>
 
@@ -145,11 +135,10 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
           <span className="text-xs text-[#7d7468] uppercase font-semibold tracking-wider">
             {lang === 'es' ? 'Total Reservas Registradas' : 'Total Bookings'}
           </span>
-          <p className="text-3xl font-serif font-bold text-[#2d2a26] mt-1">
-            {reservations.length}
-          </p>
+          <p className="text-3xl font-serif font-bold text-[#2d2a26] mt-1">{reservations.length}</p>
           <span className="text-[11px] text-[#415344] font-medium">
-            {reservations.filter((r) => r.status === 'confirmed').length} {lang === 'es' ? 'confirmadas' : 'confirmed'}
+            {reservations.filter((r) => r.status === 'confirmed').length}{' '}
+            {lang === 'es' ? 'confirmadas' : 'confirmed'}
           </span>
         </div>
 
@@ -170,7 +159,12 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
             {lang === 'es' ? 'Total Abonos Requeridos (50%)' : '50% Total Deposits'}
           </span>
           <p className="text-3xl font-serif font-bold text-[#8e5d43] mt-1">
-            ${reservations.reduce((acc, r) => acc + (r.status !== 'cancelled' ? r.depositRequired : 0), 0)} <span className="text-xs font-normal text-[#7d7468]">USD</span>
+            $
+            {reservations.reduce(
+              (acc, r) => acc + (r.status !== 'cancelled' ? r.depositRequired : 0),
+              0,
+            )}{' '}
+            <span className="text-xs font-normal text-[#7d7468]">USD</span>
           </p>
           <span className="text-[11px] text-[#7d7468]">
             {lang === 'es' ? 'Abono para confirmación previa' : 'Advance confirmation value'}
@@ -182,14 +176,16 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-serif font-bold text-[#2d2a26]">
-            {lang === 'es' ? 'Citas Programadas & Fichas de Pacientes' : 'Scheduled Appointments & Client Cards'}
+            {lang === 'es'
+              ? 'Citas Programadas & Fichas de Pacientes'
+              : 'Scheduled Appointments & Client Cards'}
           </h3>
           <span className="text-xs text-[#7d7468]">
-            {filteredReservations.length} {lang === 'es' ? 'citas listadas' : 'bookings listed'}
+            {sortedReservations.length} {lang === 'es' ? 'citas listadas' : 'bookings listed'}
           </span>
         </div>
 
-        {filteredReservations.length === 0 ? (
+        {sortedReservations.length === 0 ? (
           <div className="bg-white p-12 text-center rounded-3xl border border-[#e2d7c5] shadow-xs">
             <Calendar className="w-10 h-10 text-[#c5a059] mx-auto mb-3" />
             <h4 className="text-base font-serif font-bold text-[#2d2a26]">
@@ -204,11 +200,11 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
               onClick={onNewBookingClick}
               className="mt-4 px-5 py-2.5 bg-[#415344] text-white text-xs font-semibold rounded-xl"
             >
-              {lang === 'es' ? 'Crear primera reserva de prueba' : 'Create a booking'}
+              {lang === 'es' ? 'Crear una reserva' : 'Create a booking'}
             </button>
           </div>
         ) : (
-          filteredReservations.map((res) => {
+          sortedReservations.map((res) => {
             const isExpanded = expandedId === res.id;
             const ha = res.healthAssessment;
 
@@ -226,7 +222,9 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-[#faf7f2] border border-[#ede5d8] text-[#415344] flex flex-col items-center justify-center shrink-0">
                       <span className="text-[10px] uppercase font-bold text-[#8e5d43]">
-                        {new Date(`${res.date}T00:00:00`).toLocaleDateString('es-EC', { month: 'short' })}
+                        {new Date(`${res.date}T00:00:00`).toLocaleDateString('es-EC', {
+                          month: 'short',
+                        })}
                       </span>
                       <span className="text-lg font-bold leading-none">
                         {new Date(`${res.date}T00:00:00`).getDate()}
@@ -267,9 +265,7 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
 
                   <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
                     <div className="text-right">
-                      <span className="text-xs text-[#7d7468] block">
-                        Abono 50%:
-                      </span>
+                      <span className="text-xs text-[#7d7468] block">Abono 50%:</span>
                       <span className="text-sm font-bold text-[#415344]">
                         ${res.depositRequired} USD
                       </span>
@@ -323,35 +319,58 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                       </span>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-[#5a534b]">
                         <div>
-                          <span className="text-[10px] text-[#8e8477] block">ID / Cédula / Pasaporte:</span>
-                          <span className="font-semibold text-[#2d2a26]">{ha.idNumber || 'No registrada'}</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-[#8e8477] block">F. Nacimiento / Edad:</span>
+                          <span className="text-[10px] text-[#8e8477] block">
+                            ID / Cédula / Pasaporte:
+                          </span>
                           <span className="font-semibold text-[#2d2a26]">
-                            {ha.dateOfBirth ? `${ha.dateOfBirth} (${ha.age || '—'} años)` : ha.age ? `${ha.age} años` : '—'}
+                            {ha.idNumber || 'No registrada'}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-[#8e8477] block">Nacionalidad / Ciudad:</span>
+                          <span className="text-[10px] text-[#8e8477] block">
+                            F. Nacimiento / Edad:
+                          </span>
                           <span className="font-semibold text-[#2d2a26]">
-                            {ha.nationality || 'Ecuador'} {ha.cityOfResidence ? `· ${ha.cityOfResidence}` : ''}
+                            {ha.dateOfBirth
+                              ? `${ha.dateOfBirth} (${ha.age || '—'} años)`
+                              : ha.age
+                                ? `${ha.age} años`
+                                : '—'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-[#8e8477] block">
+                            Nacionalidad / Ciudad:
+                          </span>
+                          <span className="font-semibold text-[#2d2a26]">
+                            {ha.nationality || 'Ecuador'}{' '}
+                            {ha.cityOfResidence ? `· ${ha.cityOfResidence}` : ''}
                           </span>
                         </div>
                         <div>
                           <span className="text-[10px] text-[#8e8477] block">Ocupación:</span>
-                          <span className="font-semibold text-[#2d2a26]">{ha.occupation || '—'}</span>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="text-[10px] text-[#8e8477] block">Contacto de Emergencia:</span>
-                          <span className="font-semibold text-rose-900">
-                            {ha.emergencyContact ? `${ha.emergencyContact} (${ha.emergencyPhoneNumber})` : 'No especificado'}
+                          <span className="font-semibold text-[#2d2a26]">
+                            {ha.occupation || '—'}
                           </span>
                         </div>
                         <div className="col-span-2">
-                          <span className="text-[10px] text-[#8e8477] block">Motivo de Visita:</span>
+                          <span className="text-[10px] text-[#8e8477] block">
+                            Contacto de Emergencia:
+                          </span>
+                          <span className="font-semibold text-rose-900">
+                            {ha.emergencyContact
+                              ? `${ha.emergencyContact} (${ha.emergencyPhoneNumber})`
+                              : 'No especificado'}
+                          </span>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-[10px] text-[#8e8477] block">
+                            Motivo de Visita:
+                          </span>
                           <span className="font-semibold text-[#415344]">
-                            {ha.visitReasons && ha.visitReasons.length > 0 ? ha.visitReasons.join(', ') : 'Bienestar'}
+                            {ha.visitReasons && ha.visitReasons.length > 0
+                              ? ha.visitReasons.join(', ')
+                              : 'Bienestar'}
                             {ha.otherVisitReason ? ` (${ha.otherVisitReason})` : ''}
                           </span>
                         </div>
@@ -378,24 +397,83 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
                         {[
                           { label: 'Presión alta', val: ha.medicalChecklist?.highBloodPressure },
-                          { label: 'Problemas cardíacos', val: ha.medicalChecklist?.heartProblems, alert: true },
+                          {
+                            label: 'Problemas cardíacos',
+                            val: ha.medicalChecklist?.heartProblems,
+                            alert: true,
+                          },
                           { label: 'Diabetes', val: ha.medicalChecklist?.diabetes },
-                          { label: 'Prob. circulatorios', val: ha.medicalChecklist?.circulatoryProblems },
-                          { label: 'Trombosis / Várices', val: ha.medicalChecklist?.thrombosisVaricose, alert: true },
+                          {
+                            label: 'Prob. circulatorios',
+                            val: ha.medicalChecklist?.circulatoryProblems,
+                          },
+                          {
+                            label: 'Trombosis / Várices',
+                            val: ha.medicalChecklist?.thrombosisVaricose,
+                            alert: true,
+                          },
                           { label: 'Epilepsia', val: ha.medicalChecklist?.epilepsy, alert: true },
-                          { label: 'Asma / Respiratorio', val: ha.medicalChecklist?.asthma || ha.medicalChecklist?.respiratoryProblems },
-                          { label: 'Prob. en columna', val: ha.medicalChecklist?.spinalProblems, alert: true },
-                          { label: 'Lesiones recientes', val: ha.medicalChecklist?.recentMuscleInjuries },
-                          { label: 'Fracturas recientes', val: ha.medicalChecklist?.recentFractures, alert: true },
-                          { label: 'Cirugías 12 meses', val: ha.medicalChecklist?.surgeriesLast12Months, alert: true, detail: ha.medicalChecklist?.surgeriesDetails || ha.surgeriesDetails },
+                          {
+                            label: 'Asma / Respiratorio',
+                            val:
+                              ha.medicalChecklist?.asthma ||
+                              ha.medicalChecklist?.respiratoryProblems,
+                          },
+                          {
+                            label: 'Prob. en columna',
+                            val: ha.medicalChecklist?.spinalProblems,
+                            alert: true,
+                          },
+                          {
+                            label: 'Lesiones recientes',
+                            val: ha.medicalChecklist?.recentMuscleInjuries,
+                          },
+                          {
+                            label: 'Fracturas recientes',
+                            val: ha.medicalChecklist?.recentFractures,
+                            alert: true,
+                          },
+                          {
+                            label: 'Cirugías 12 meses',
+                            val: ha.medicalChecklist?.surgeriesLast12Months,
+                            alert: true,
+                            detail: ha.medicalChecklist?.surgeriesDetails || ha.surgeriesDetails,
+                          },
                           { label: 'Condiciones piel', val: ha.medicalChecklist?.skinConditions },
-                          { label: 'Alergias', val: ha.medicalChecklist?.allergies || ha.hasAllergies, alert: true, detail: ha.medicalChecklist?.allergiesDetails || ha.allergiesList.join(', ') },
-                          { label: 'Embarazo', val: ha.medicalChecklist?.pregnancy || ha.isPregnant, alert: true, detail: ha.pregnancyWeeks ? `${ha.pregnancyWeeks} sem` : '' },
+                          {
+                            label: 'Alergias',
+                            val: ha.medicalChecklist?.allergies || ha.hasAllergies,
+                            alert: true,
+                            detail:
+                              ha.medicalChecklist?.allergiesDetails || ha.allergiesList.join(', '),
+                          },
+                          {
+                            label: 'Embarazo',
+                            val: ha.medicalChecklist?.pregnancy || ha.isPregnant,
+                            alert: true,
+                            detail: ha.pregnancyWeeks ? `${ha.pregnancyWeeks} sem` : '',
+                          },
                           { label: 'Lactancia', val: ha.medicalChecklist?.breastfeeding },
-                          { label: 'Cáncer / Antecedentes', val: ha.medicalChecklist?.cancerHistory, alert: true },
-                          { label: 'Medicación actual', val: ha.medicalChecklist?.currentMedications, detail: ha.medicalChecklist?.medicationsDetails },
-                          { label: 'Marcapasos / Dispositivo', val: ha.medicalChecklist?.pacemakerDevices, alert: true },
-                          { label: 'Otras condiciones', val: ha.medicalChecklist?.otherConditions, detail: ha.medicalChecklist?.otherConditionsDetails },
+                          {
+                            label: 'Cáncer / Antecedentes',
+                            val: ha.medicalChecklist?.cancerHistory,
+                            alert: true,
+                          },
+                          {
+                            label: 'Medicación actual',
+                            val: ha.medicalChecklist?.currentMedications,
+                            detail: ha.medicalChecklist?.medicationsDetails,
+                          },
+                          {
+                            label: 'Marcapasos / Dispositivo',
+                            val: ha.medicalChecklist?.pacemakerDevices,
+                            alert: true,
+                          },
+                          {
+                            label: 'Otras condiciones',
+                            val: ha.medicalChecklist?.otherConditions,
+                            detail: ha.medicalChecklist?.otherConditionsDetails,
+                          },
                         ].map((mItem, mIdx) => (
                           <div
                             key={mIdx}
@@ -409,7 +487,9 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-[11px] truncate">{mItem.label}:</span>
-                              <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${mItem.val ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'}`}>
+                              <span
+                                className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${mItem.val ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'}`}
+                              >
                                 {mItem.val ? 'SÍ' : 'NO'}
                               </span>
                             </div>
@@ -424,7 +504,10 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                     </div>
 
                     {/* Critical health alerts banner */}
-                    {(ha.isPregnant || ha.hasAllergies || ha.hasRestrictions || ha.hasSurgeries) && (
+                    {(ha.isPregnant ||
+                      ha.hasAllergies ||
+                      ha.hasRestrictions ||
+                      ha.hasSurgeries) && (
                       <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl space-y-1.5 text-xs text-rose-950">
                         <span className="font-bold flex items-center gap-1 text-rose-800">
                           <AlertTriangle className="w-4 h-4 text-rose-700" />
@@ -432,12 +515,16 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                         </span>
                         {ha.isPregnant && (
                           <p>
-                            • <strong>Embarazo:</strong> Sí ({ha.pregnancyWeeks ? `${ha.pregnancyWeeks} semanas` : 'Gestación'}). Evitar posturas prona y piedras calientes directas.
+                            • <strong>Embarazo:</strong> Sí (
+                            {ha.pregnancyWeeks ? `${ha.pregnancyWeeks} semanas` : 'Gestación'}).
+                            Evitar posturas prona y piedras calientes directas.
                           </p>
                         )}
                         {ha.hasAllergies && (
                           <p>
-                            • <strong>Alergias / Sensibilidades:</strong> {ha.allergiesList.join(', ')} {ha.otherAllergies && `(${ha.otherAllergies})`}
+                            • <strong>Alergias / Sensibilidades:</strong>{' '}
+                            {ha.allergiesList.join(', ')}{' '}
+                            {ha.otherAllergies && `(${ha.otherAllergies})`}
                           </p>
                         )}
                         {ha.hasRestrictions && (
@@ -447,7 +534,8 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                         )}
                         {ha.hasSurgeries && (
                           <p>
-                            • <strong>Cirugías / Implantes:</strong> {ha.surgeriesDetails} {ha.surgeriesDate && `(${ha.surgeriesDate})`}
+                            • <strong>Cirugías / Implantes:</strong> {ha.surgeriesDetails}{' '}
+                            {ha.surgeriesDate && `(${ha.surgeriesDate})`}
                           </p>
                         )}
                       </div>
@@ -460,7 +548,9 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                           🟢 Zonas prioritarias a enfocar:
                         </span>
                         <p className="font-medium text-[#2d2a26]">
-                          {ha.focusAreas.length > 0 ? ha.focusAreas.join(' • ') : 'Equilibrio general'}
+                          {ha.focusAreas.length > 0
+                            ? ha.focusAreas.join(' • ')
+                            : 'Equilibrio general'}
                         </p>
                       </div>
 
@@ -469,7 +559,9 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                           🔴 Zonas a evitar o tratar con suavidad:
                         </span>
                         <p className="font-medium text-[#2d2a26]">
-                          {ha.avoidAreas.length > 0 ? ha.avoidAreas.join(' • ') : 'Ninguna zona excluida'}
+                          {ha.avoidAreas.length > 0
+                            ? ha.avoidAreas.join(' • ')
+                            : 'Ninguna zona excluida'}
                         </p>
                       </div>
                     </div>
@@ -477,14 +569,18 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                     {/* Pressure, Stress, and Intention */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                       <div className="p-3 bg-white rounded-xl border border-[#e2d7c5]">
-                        <span className="text-[11px] text-[#7d7468] block">Preferencia de Presión:</span>
+                        <span className="text-[11px] text-[#7d7468] block">
+                          Preferencia de Presión:
+                        </span>
                         <span className="font-bold text-[#2d2a26] uppercase">
                           {ha.pressurePreference}
                         </span>
                       </div>
 
                       <div className="p-3 bg-white rounded-xl border border-[#e2d7c5]">
-                        <span className="text-[11px] text-[#7d7468] block">Nivel de Estrés / Sobrecarga:</span>
+                        <span className="text-[11px] text-[#7d7468] block">
+                          Nivel de Estrés / Sobrecarga:
+                        </span>
                         <span className="font-bold text-[#415344]">
                           {ha.currentStressLevel} / 10
                         </span>
@@ -563,8 +659,8 @@ export const CalendarManagerView: React.FC<CalendarManagerViewProps> = ({
                     ? 'Cancelando...'
                     : 'Cancelling...'
                   : lang === 'es'
-                  ? 'Sí, cancelar cita'
-                  : 'Yes, cancel'}
+                    ? 'Sí, cancelar cita'
+                    : 'Yes, cancel'}
               </button>
             </div>
           </div>

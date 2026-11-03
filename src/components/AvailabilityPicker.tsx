@@ -1,18 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { GoogleCalendarEvent, BookingReservation } from '../types/spa';
-import {
-  Calendar as CalendarIcon,
-  Clock,
-  ArrowRight,
-  ArrowLeft,
-  RefreshCw,
-  CheckCircle,
-  AlertCircle,
-  Sparkles,
-} from 'lucide-react';
+import React, { useMemo } from 'react';
+import { GoogleCalendarEvent, BookingReservation, Lang } from '../types/spa';
+import { Calendar as CalendarIcon, Clock, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import { addDays, toISODate } from '../utils/date';
+import { BackButton, NextButton } from './ui';
+
+/** Horarios estándar de la terapeuta. */
+const TIME_SLOTS = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00', '18:30'];
 
 interface AvailabilityPickerProps {
-  lang: 'es' | 'en';
+  lang: Lang;
   selectedDate: string;
   setSelectedDate: (date: string) => void;
   selectedTimeSlot: string;
@@ -44,56 +40,29 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
 }) => {
   // Generate next 21 days
   const dateOptions = useMemo(() => {
-    const list: { iso: string; dayName: string; dayNum: number; monthName: string; isWeekend: boolean }[] = [];
-    const today = new Date();
-
-    for (let i = 0; i < 21; i++) {
-      const d = new Date();
-      d.setDate(today.getDate() + i);
-
-      const iso = d.toISOString().split('T')[0];
-      const dayName = d.toLocaleDateString(lang === 'es' ? 'es-EC' : 'en-US', { weekday: 'short' });
-      const dayNum = d.getDate();
-      const monthName = d.toLocaleDateString(lang === 'es' ? 'es-EC' : 'en-US', { month: 'short' });
-      const dayOfWeek = d.getDay();
-
-      list.push({
-        iso,
-        dayName,
-        dayNum,
-        monthName,
-        isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
-      });
-    }
-    return list;
+    const locale = lang === 'es' ? 'es-EC' : 'en-US';
+    return Array.from({ length: 21 }, (_, i) => {
+      const d = addDays(i);
+      return {
+        iso: toISODate(d),
+        dayName: d.toLocaleDateString(locale, { weekday: 'short' }),
+        dayNum: d.getDate(),
+        monthName: d.toLocaleDateString(locale, { month: 'short' }),
+      };
+    });
   }, [lang]);
-
-  // Standard therapist schedule slots
-  const allTimeSlots = [
-    '09:00',
-    '10:30',
-    '12:00',
-    '14:00',
-    '15:30',
-    '17:00',
-    '18:30',
-  ];
 
   // Calculate conflict with Google Calendar events and existing bookings
   const slotAvailability = useMemo(() => {
-    return allTimeSlots.map((slot) => {
-      const [slotHours, slotMinutes] = slot.split(':').map(Number);
+    return TIME_SLOTS.map((slot) => {
       const slotStart = new Date(`${selectedDate}T${slot}:00`);
       const slotEnd = new Date(slotStart.getTime() + durationMinutes * 60000);
 
       // 1. Check local / stored reservations
       const internalConflict = existingReservations.some((r) => {
         if (r.date !== selectedDate || r.status === 'cancelled') return false;
-        const [rHours, rMin] = r.timeSlot.split(':').map(Number);
         const rStart = new Date(`${r.date}T${r.timeSlot}:00`);
         const rEnd = new Date(rStart.getTime() + r.durationMinutes * 60000);
-
-        // Overlap condition
         return slotStart < rEnd && slotEnd > rStart;
       });
 
@@ -106,24 +75,20 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
         const evtStart = new Date(evtStartStr);
         const evtEnd = new Date(evtEndStr);
 
-        // Check if on same day
-        const evtDate = evtStart.toISOString().split('T')[0];
+        // All-day events carry a plain date; timed events are compared in local time
+        const evtDate = evt.start?.dateTime ? toISODate(evtStart) : evt.start?.date;
         if (evtDate !== selectedDate) return false;
 
         return slotStart < evtEnd && slotEnd > evtStart;
       });
 
-      const isBooked = internalConflict || googleConflict;
-
       return {
         slot,
-        isBooked,
+        isBooked: internalConflict || googleConflict,
         conflictType: googleConflict ? 'google' : internalConflict ? 'reservation' : null,
       };
     });
   }, [selectedDate, durationMinutes, calendarEvents, existingReservations]);
-
-  const selectedSlotInfo = slotAvailability.find((s) => s.slot === selectedTimeSlot);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -144,7 +109,9 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
             ) : (
               <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-medium">
                 <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                {lang === 'es' ? 'Agenda local activa (Conecta Google para sync)' : 'Local agenda active'}
+                {lang === 'es'
+                  ? 'Agenda local activa (Conecta Google para sync)'
+                  : 'Local agenda active'}
               </span>
             )}
 
@@ -163,7 +130,9 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
         </div>
 
         <h2 className="text-2xl font-serif font-bold text-[#2d2a26]">
-          {lang === 'es' ? 'Selecciona Fecha y Hora de tu Sesión' : 'Select Date & Time for Your Session'}
+          {lang === 'es'
+            ? 'Selecciona Fecha y Hora de tu Sesión'
+            : 'Select Date & Time for Your Session'}
         </h2>
         <p className="text-sm text-[#615a51] mt-1 font-light leading-relaxed">
           {lang === 'es'
@@ -184,7 +153,7 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
           <span className="text-xs text-[#8e5d43] font-medium">
             {new Date(`${selectedDate}T00:00:00`).toLocaleDateString(
               lang === 'es' ? 'es-EC' : 'en-US',
-              { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }
+              { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' },
             )}
           </span>
         </div>
@@ -226,7 +195,9 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-[#415344]" />
             <h3 className="text-sm font-semibold text-[#2d2a26] uppercase tracking-wider">
-              {lang === 'es' ? '2. Turnos Disponibles de la Terapeuta:' : '2. Therapist Open Slots:'}
+              {lang === 'es'
+                ? '2. Turnos Disponibles de la Terapeuta:'
+                : '2. Therapist Open Slots:'}
             </h3>
           </div>
           <div className="flex items-center gap-3 text-xs">
@@ -255,18 +226,14 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
                   isBooked
                     ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
                     : isSelected
-                    ? 'bg-[#415344] text-white border-[#415344] shadow-md ring-2 ring-[#c5a059]'
-                    : 'bg-[#faf8f5] hover:bg-[#ede5d8] text-[#2d2a26] border-[#d8ccbc]'
+                      ? 'bg-[#415344] text-white border-[#415344] shadow-md ring-2 ring-[#c5a059]'
+                      : 'bg-[#faf8f5] hover:bg-[#ede5d8] text-[#2d2a26] border-[#d8ccbc]'
                 }`}
               >
                 <span className="text-base font-bold block">{slot}</span>
                 <span
                   className={`text-[11px] block mt-1 font-medium ${
-                    isBooked
-                      ? 'text-gray-400'
-                      : isSelected
-                      ? 'text-[#ebd8b1]'
-                      : 'text-emerald-700'
+                    isBooked ? 'text-gray-400' : isSelected ? 'text-[#ebd8b1]' : 'text-emerald-700'
                   }`}
                 >
                   {isBooked
@@ -274,8 +241,8 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
                       ? 'Cita en Google'
                       : 'Reservado'
                     : lang === 'es'
-                    ? 'Libre'
-                    : 'Open'}
+                      ? 'Libre'
+                      : 'Open'}
                 </span>
               </button>
             );
@@ -313,24 +280,12 @@ export const AvailabilityPicker: React.FC<AvailabilityPickerProps> = ({
 
       {/* Navigation Buttons */}
       <div className="flex items-center justify-between gap-4 pt-2">
-        <button
-          type="button"
-          onClick={onBack}
-          className="px-5 py-3 rounded-xl border border-[#d8ccbc] bg-white hover:bg-[#f0eae1] text-[#4a453e] font-semibold text-sm flex items-center gap-2 transition-all shadow-xs"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>{lang === 'es' ? 'Volver a Ficha de Salud' : 'Back to Health Form'}</span>
-        </button>
-
-        <button
-          type="button"
-          disabled={!selectedTimeSlot}
-          onClick={onNext}
-          className="px-7 py-3 rounded-xl bg-[#415344] hover:bg-[#344337] disabled:opacity-50 disabled:pointer-events-none text-white font-semibold text-sm flex items-center gap-2 transition-all shadow-md"
-        >
-          <span>{lang === 'es' ? 'Continuar con Datos & Abono' : 'Next: Payment & Deposit'}</span>
-          <ArrowRight className="w-4 h-4 text-[#c5a059]" />
-        </button>
+        <BackButton onClick={onBack}>
+          {lang === 'es' ? 'Volver a Ficha de Salud' : 'Back to Health Form'}
+        </BackButton>
+        <NextButton disabled={!selectedTimeSlot} onClick={onNext}>
+          {lang === 'es' ? 'Continuar con Datos & Abono' : 'Next: Payment & Deposit'}
+        </NextButton>
       </div>
     </div>
   );

@@ -8,14 +8,49 @@ import {
   CalendarCheck2,
   Globe,
   Phone,
+  LucideIcon,
 } from 'lucide-react';
 import { User } from 'firebase/auth';
+import { Lang, Tab } from '../types/spa';
+import { BRAND, quote, whatsappUrl } from '../data/brand';
+
+const TABS: {
+  id: Tab;
+  icon: LucideIcon;
+  label: Record<Lang, string>;
+  mobileLabel: Record<Lang, string>;
+}[] = [
+  {
+    id: 'book',
+    icon: Calendar,
+    label: { es: 'Reservar Cita', en: 'Book Session' },
+    mobileLabel: { es: 'Reservar', en: 'Book' },
+  },
+  {
+    id: 'catalog',
+    icon: ClipboardList,
+    label: { es: 'Carta de Servicios', en: 'Spa Menu' },
+    mobileLabel: { es: 'Carta de Servicios', en: 'Spa Menu' },
+  },
+  {
+    id: 'agenda',
+    icon: CalendarCheck2,
+    label: { es: 'Agenda & Calendario', en: 'Therapist Agenda' },
+    mobileLabel: { es: 'Agenda', en: 'Agenda' },
+  },
+  {
+    id: 'about',
+    icon: UserCheck,
+    label: { es: 'Lisett Morante', en: 'About' },
+    mobileLabel: { es: 'Lisett', en: 'Lisett' },
+  },
+];
 
 interface NavbarProps {
-  currentTab: 'book' | 'catalog' | 'agenda' | 'about';
-  setCurrentTab: (tab: 'book' | 'catalog' | 'agenda' | 'about') => void;
-  lang: 'es' | 'en';
-  setLang: (lang: 'es' | 'en') => void;
+  currentTab: Tab;
+  setCurrentTab: (tab: Tab) => void;
+  lang: Lang;
+  setLang: (lang: Lang) => void;
   user: User | null;
   hasToken: boolean;
   onLogin: () => void;
@@ -34,6 +69,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   isLoggingIn,
 }) => {
+  // La agenda con fichas de salud solo aparece con la sesión de Google iniciada
+  const visibleTabs = TABS.filter((tab) => tab.id !== 'agenda' || hasToken);
+
   return (
     <header className="sticky top-0 z-50 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e2d7c5] shadow-xs">
       {/* Top Banner with Quote & WhatsApp */}
@@ -42,25 +80,25 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-[#c5a059]">✦</span>
             <span className="font-serif italic tracking-wide text-xs sm:text-sm">
-              {lang === 'es'
-                ? '"Tu cuerpo recuerda lo que tu mente olvidó."'
-                : '"Your body remembers what your mind has forgotten."'}
+              {quote(lang)}
             </span>
             <span className="hidden md:inline text-[#c5a059]/60">·</span>
             <span className="hidden md:inline text-[11px] opacity-80 uppercase tracking-widest">
-              Ancestral Wellness Experience · Ecuador
+              {BRAND.fullName} · Ecuador
             </span>
           </div>
 
           <div className="flex items-center gap-4 text-xs">
             <a
-              href="https://wa.me/593990587684?text=Hola%20Lisett,%20deseo%20informaci%C3%B3n%20sobre%20las%20sesiones%20en%20AWE%20SPA"
+              href={whatsappUrl(
+                `Hola Lisett, deseo información sobre las sesiones en ${BRAND.name}`,
+              )}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-[#c5a059] transition-colors"
             >
               <Phone className="w-3.5 h-3.5 text-[#c5a059]" />
-              <span className="font-medium">+593 99 058 7684</span>
+              <span className="font-medium">{BRAND.whatsapp.display}</span>
             </a>
             <div className="h-3 w-px bg-white/20" />
             <button
@@ -88,71 +126,40 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-semibold tracking-[0.25em] text-[#8e5d43] uppercase">
-                  AWE SPA
+                  {BRAND.name}
                 </span>
                 <span className="text-[10px] text-[#c5a059]">✦</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#2d2a26] tracking-tight leading-none group-hover:text-[#415344] transition-colors">
-                Lisett Morante
+                {BRAND.therapist}
               </h1>
               <p className="text-[11px] text-[#6b645b] font-medium tracking-wider">
-                Spa & Holistic Wellness
+                {BRAND.subtitle}
               </p>
             </div>
           </div>
 
           {/* Navigation Tabs */}
           <nav className="hidden lg:flex items-center gap-1">
-            <button
-              onClick={() => setCurrentTab('book')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                currentTab === 'book'
-                  ? 'bg-[#415344] text-white shadow-xs'
-                  : 'text-[#4a453e] hover:bg-[#ede5d8]'
-              }`}
-            >
-              <Calendar className="w-4 h-4 text-[#c5a059]" />
-              <span>{lang === 'es' ? 'Reservar Cita' : 'Book Session'}</span>
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('catalog')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                currentTab === 'catalog'
-                  ? 'bg-[#415344] text-white shadow-xs'
-                  : 'text-[#4a453e] hover:bg-[#ede5d8]'
-              }`}
-            >
-              <ClipboardList className="w-4 h-4 text-[#c5a059]" />
-              <span>{lang === 'es' ? 'Carta de Servicios' : 'Spa Menu'}</span>
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('agenda')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 relative ${
-                currentTab === 'agenda'
-                  ? 'bg-[#415344] text-white shadow-xs'
-                  : 'text-[#4a453e] hover:bg-[#ede5d8]'
-              }`}
-            >
-              <CalendarCheck2 className="w-4 h-4 text-[#c5a059]" />
-              <span>{lang === 'es' ? 'Agenda & Calendario' : 'Therapist Agenda'}</span>
-              {hasToken && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('about')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                currentTab === 'about'
-                  ? 'bg-[#415344] text-white shadow-xs'
-                  : 'text-[#4a453e] hover:bg-[#ede5d8]'
-              }`}
-            >
-              <UserCheck className="w-4 h-4 text-[#c5a059]" />
-              <span>{lang === 'es' ? 'Lisett Morante' : 'About'}</span>
-            </button>
+            {visibleTabs.map(({ id, icon: Icon, label }) => (
+              <button
+                key={id}
+                onClick={() => setCurrentTab(id)}
+                className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  id === 'agenda' ? 'relative' : ''
+                } ${
+                  currentTab === id
+                    ? 'bg-[#415344] text-white shadow-xs'
+                    : 'text-[#4a453e] hover:bg-[#ede5d8]'
+                }`}
+              >
+                <Icon className="w-4 h-4 text-[#c5a059]" />
+                <span>{label[lang]}</span>
+                {id === 'agenda' && hasToken && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                )}
+              </button>
+            ))}
           </nav>
 
           {/* Google Auth Status / Button (following Workspace Skill design) */}
@@ -220,47 +227,20 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Mobile Navigation bar */}
         <div className="flex lg:hidden overflow-x-auto py-2 gap-1.5 border-t border-[#ede5d8] no-scrollbar">
-          <button
-            onClick={() => setCurrentTab('book')}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
-              currentTab === 'book'
-                ? 'bg-[#415344] text-white'
-                : 'bg-[#f0eae1] text-[#4a453e]'
-            }`}
-          >
-            {lang === 'es' ? 'Reservar' : 'Book'}
-          </button>
-          <button
-            onClick={() => setCurrentTab('catalog')}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
-              currentTab === 'catalog'
-                ? 'bg-[#415344] text-white'
-                : 'bg-[#f0eae1] text-[#4a453e]'
-            }`}
-          >
-            {lang === 'es' ? 'Carta de Servicios' : 'Spa Menu'}
-          </button>
-          <button
-            onClick={() => setCurrentTab('agenda')}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1 ${
-              currentTab === 'agenda'
-                ? 'bg-[#415344] text-white'
-                : 'bg-[#f0eae1] text-[#4a453e]'
-            }`}
-          >
-            <span>{lang === 'es' ? 'Agenda' : 'Agenda'}</span>
-            {hasToken && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
-          </button>
-          <button
-            onClick={() => setCurrentTab('about')}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
-              currentTab === 'about'
-                ? 'bg-[#415344] text-white'
-                : 'bg-[#f0eae1] text-[#4a453e]'
-            }`}
-          >
-            Lisett
-          </button>
+          {visibleTabs.map(({ id, mobileLabel }) => (
+            <button
+              key={id}
+              onClick={() => setCurrentTab(id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                id === 'agenda' ? 'flex items-center gap-1' : ''
+              } ${currentTab === id ? 'bg-[#415344] text-white' : 'bg-[#f0eae1] text-[#4a453e]'}`}
+            >
+              <span>{mobileLabel[lang]}</span>
+              {id === 'agenda' && hasToken && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              )}
+            </button>
+          ))}
         </div>
       </div>
     </header>

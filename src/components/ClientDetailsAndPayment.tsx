@@ -1,34 +1,94 @@
 import React, { useState } from 'react';
-import { Treatment, TreatmentDuration, HealthAssessment } from '../types/spa';
+import { Lang, PaymentMethod, Treatment, TreatmentDuration } from '../types/spa';
 import {
   CreditCard,
   Building2,
   Banknote,
   ShieldCheck,
-  CheckCircle,
-  ArrowLeft,
   Clock,
   Calendar,
   Lock,
   Phone,
   Sparkles,
 } from 'lucide-react';
+import { BRAND, calcDeposit } from '../data/brand';
+import { BackButton, BankTransferLines, Field } from './ui';
+
+const PAYMENT_METHODS: {
+  id: PaymentMethod;
+  labelEs: string;
+  labelEn: string;
+  descEs: string;
+  descEn: string;
+  icon: typeof CreditCard;
+}[] = [
+  {
+    id: 'transfer',
+    labelEs: 'Transferencia Bancaria',
+    labelEn: 'Bank Transfer',
+    descEs: 'Banco Pichincha / Produbanco / De Una',
+    descEn: 'Pichincha / Produbanco / De Una',
+    icon: Building2,
+  },
+  {
+    id: 'card',
+    labelEs: 'Tarjeta de Crédito / Débito',
+    labelEn: 'Credit / Debit Card',
+    descEs: 'Visa, Mastercard, Diners',
+    descEn: 'Visa, Mastercard, Diners',
+    icon: CreditCard,
+  },
+  {
+    id: 'cash',
+    labelEs: 'Efectivo / Pago en Spa',
+    labelEn: 'Cash at Spa',
+    descEs: 'Abonar previamente o coordinar',
+    descEn: 'Direct coordination',
+    icon: Banknote,
+  },
+];
+
+const POLICIES: { titleEs: string; titleEn: string; bodyEs: string; bodyEn: string }[] = [
+  {
+    titleEs: '✦ Reservas & Cupos Limitados',
+    titleEn: '✦ Limited Reserved Spots',
+    bodyEs: 'Abono de confirmación del 50%. Reserva con anticipación.',
+    bodyEn: '50% confirmation deposit. Advance booking recommended.',
+  },
+  {
+    titleEs: '✦ Cancelación Gratuita',
+    titleEn: '✦ Free Cancellation',
+    bodyEs: 'Cancelación sin penalidad hasta 24 horas antes de tu sesión.',
+    bodyEn: 'Free cancellation up to 24 hours prior to appointment.',
+  },
+  {
+    titleEs: '✦ Puntualidad & Ropa Cómoda',
+    titleEn: '✦ Punctuality & Attire',
+    bodyEs: 'Llegar 10 minutos antes. Ropa cómoda (se provee cobertura higiénica).',
+    bodyEn: 'Arrive 10 min early. Comfortable clothing or draping provided.',
+  },
+  {
+    titleEs: '✦ Cuidado Post-Sesión',
+    titleEn: '✦ Post-Session Care',
+    bodyEs: 'Hidratación abundante post-sesión para drenar toxinas acumuladas.',
+    bodyEn: 'Abundant post-session hydration to assist toxin elimination.',
+  },
+];
 
 interface ClientDetailsAndPaymentProps {
-  lang: 'es' | 'en';
+  lang: Lang;
   treatment: Treatment;
   duration: TreatmentDuration;
   date: string;
   timeSlot: string;
-  healthAssessment: HealthAssessment;
   clientName: string;
   setClientName: (name: string) => void;
   clientEmail: string;
   setClientEmail: (email: string) => void;
   clientPhone: string;
   setClientPhone: (phone: string) => void;
-  paymentMethod: 'cash' | 'transfer' | 'card';
-  setPaymentMethod: (pm: 'cash' | 'transfer' | 'card') => void;
+  paymentMethod: PaymentMethod;
+  setPaymentMethod: (pm: PaymentMethod) => void;
   onBack: () => void;
   onConfirmBooking: () => Promise<void>;
   isSubmitting: boolean;
@@ -40,7 +100,6 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
   duration,
   date,
   timeSlot,
-  healthAssessment,
   clientName,
   setClientName,
   clientEmail,
@@ -55,26 +114,42 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
 }) => {
   const [agreedPolicies, setAgreedPolicies] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  // Los datos de contacto ya se piden en la ficha de salud: solo se muestran si falta alguno
+  const [showContact] = useState(
+    () => !clientName.trim() || !clientPhone.trim() || !clientEmail.trim(),
+  );
 
   const totalPrice = duration.price;
-  const depositAmount = totalPrice * 0.5;
+  const depositAmount = calcDeposit(totalPrice);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clientName.trim()) {
-      setErrorMessage(lang === 'es' ? 'Por favor ingresa tu nombre completo.' : 'Please enter your full name.');
+      setErrorMessage(
+        lang === 'es' ? 'Por favor ingresa tu nombre completo.' : 'Please enter your full name.',
+      );
       return;
     }
     if (!clientPhone.trim()) {
-      setErrorMessage(lang === 'es' ? 'Por favor ingresa tu número de WhatsApp para contacto.' : 'Please enter your WhatsApp contact number.');
+      setErrorMessage(
+        lang === 'es'
+          ? 'Por favor ingresa tu número de WhatsApp para contacto.'
+          : 'Please enter your WhatsApp contact number.',
+      );
       return;
     }
     if (!clientEmail.trim()) {
-      setErrorMessage(lang === 'es' ? 'Por favor ingresa tu correo electrónico.' : 'Please enter your email.');
+      setErrorMessage(
+        lang === 'es' ? 'Por favor ingresa tu correo electrónico.' : 'Please enter your email.',
+      );
       return;
     }
     if (!agreedPolicies) {
-      setErrorMessage(lang === 'es' ? 'Debes aceptar las políticas de reserva y cancelación.' : 'Please accept spa policies.');
+      setErrorMessage(
+        lang === 'es'
+          ? 'Debes aceptar las políticas de reserva y cancelación.'
+          : 'Please accept spa policies.',
+      );
       return;
     }
 
@@ -145,7 +220,9 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
               </span>
               {duration.savings && (
                 <span className="ml-2 text-xs font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
-                  {lang === 'es' ? `Ahorras $${duration.savings} USD` : `Save $${duration.savings} USD`}
+                  {lang === 'es'
+                    ? `Ahorras $${duration.savings} USD`
+                    : `Save $${duration.savings} USD`}
                 </span>
               )}
             </div>
@@ -166,96 +243,70 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
           </div>
         </div>
 
-        {/* Client Contact Details */}
-        <div className="bg-white p-6 rounded-2xl border border-[#e2d7c5] shadow-xs space-y-4">
-          <h3 className="text-sm font-semibold text-[#2d2a26] uppercase tracking-wider">
-            {lang === 'es' ? '1. Datos de Contacto del Cliente' : '1. Client Contact Details'}
-          </h3>
+        {/* Client Contact Details (only if missing) */}
+        {showContact && (
+          <div className="bg-white p-6 rounded-2xl border border-[#e2d7c5] shadow-xs space-y-4">
+            <h3 className="text-sm font-semibold text-[#2d2a26] uppercase tracking-wider">
+              {lang === 'es' ? '1. Datos de Contacto del Cliente' : '1. Client Contact Details'}
+            </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-[#4a453e] block mb-1">
-                {lang === 'es' ? 'Nombre y Apellidos completos *' : 'Full Name *'}
-              </label>
-              <input
-                type="text"
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field
+                large
                 required
-                value={clientName}
-                onChange={(e) => setClientName(e.target.value)}
+                className="sm:col-span-2"
+                label={lang === 'es' ? 'Nombre y Apellidos completos *' : 'Full Name *'}
                 placeholder="Ej. Valeria Mendoza"
-                className="w-full p-3 bg-[#faf8f5] rounded-xl border border-[#d8ccbc] text-sm focus:outline-none focus:ring-2 focus:ring-[#415344]"
+                value={clientName}
+                onChange={setClientName}
               />
-            </div>
 
-            <div>
-              <label className="text-xs font-semibold text-[#4a453e] block mb-1 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-[#8e5d43]" />
-                {lang === 'es' ? 'WhatsApp / Teléfono de Contacto *' : 'WhatsApp / Mobile Number *'}
-              </label>
-              <input
+              <Field
+                large
+                required
                 type="tel"
-                required
-                value={clientPhone}
-                onChange={(e) => setClientPhone(e.target.value)}
+                icon={<Phone className="w-3.5 h-3.5 text-[#8e5d43]" />}
+                labelClassName="text-xs font-semibold text-[#4a453e] block mb-1 flex items-center gap-1.5"
+                label={
+                  lang === 'es' ? 'WhatsApp / Teléfono de Contacto *' : 'WhatsApp / Mobile Number *'
+                }
                 placeholder="+593 99 ..."
-                className="w-full p-3 bg-[#faf8f5] rounded-xl border border-[#d8ccbc] text-sm focus:outline-none focus:ring-2 focus:ring-[#415344]"
+                hint={
+                  lang === 'es'
+                    ? 'Te enviaremos la confirmación directa por WhatsApp'
+                    : 'We will send WhatsApp confirmation directly'
+                }
+                value={clientPhone}
+                onChange={setClientPhone}
               />
-              <span className="text-[10px] text-[#8e8477] mt-1 block">
-                {lang === 'es'
-                  ? 'Te enviaremos la confirmación directa por WhatsApp'
-                  : 'We will send WhatsApp confirmation directly'}
-              </span>
-            </div>
 
-            <div>
-              <label className="text-xs font-semibold text-[#4a453e] block mb-1">
-                {lang === 'es' ? 'Correo Electrónico (para invitación Google Calendar) *' : 'Email Address *'}
-              </label>
-              <input
-                type="email"
+              <Field
+                large
                 required
-                value={clientEmail}
-                onChange={(e) => setClientEmail(e.target.value)}
+                type="email"
+                label={
+                  lang === 'es'
+                    ? 'Correo Electrónico (para invitación Google Calendar) *'
+                    : 'Email Address *'
+                }
                 placeholder="valeria@example.com"
-                className="w-full p-3 bg-[#faf8f5] rounded-xl border border-[#d8ccbc] text-sm focus:outline-none focus:ring-2 focus:ring-[#415344]"
+                value={clientEmail}
+                onChange={setClientEmail}
               />
             </div>
           </div>
-        </div>
+        )}
 
         {/* Payment Method Selector */}
         <div className="bg-white p-6 rounded-2xl border border-[#e2d7c5] shadow-xs space-y-4">
           <h3 className="text-sm font-semibold text-[#2d2a26] uppercase tracking-wider">
-            {lang === 'es' ? '2. Método para el Abono del 50%' : '2. Payment Method for 50% Deposit'}
+            {lang === 'es'
+              ? `${showContact ? '2' : '1'}. Método para el Abono del 50%`
+              : `${showContact ? '2' : '1'}. Payment Method for 50% Deposit`}
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              {
-                id: 'transfer',
-                labelEs: 'Transferencia Bancaria',
-                labelEn: 'Bank Transfer',
-                descEs: 'Banco Pichincha / Produbanco / De Una',
-                descEn: 'Pichincha / Produbanco / De Una',
-                icon: Building2,
-              },
-              {
-                id: 'card',
-                labelEs: 'Tarjeta de Crédito / Débito',
-                labelEn: 'Credit / Debit Card',
-                descEs: 'Visa, Mastercard, Diners',
-                descEn: 'Visa, Mastercard, Diners',
-                icon: CreditCard,
-              },
-              {
-                id: 'cash',
-                labelEs: 'Efectivo / Pago en Spa',
-                labelEn: 'Cash at Spa',
-                descEs: 'Abonar previamente o coordinar',
-                descEn: 'Direct coordination',
-                icon: Banknote,
-              },
-            ].map((m) => {
+            {PAYMENT_METHODS.map((m) => {
               const Icon = m.icon;
               const isSelected = paymentMethod === m.id;
 
@@ -263,14 +314,16 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
                 <button
                   key={m.id}
                   type="button"
-                  onClick={() => setPaymentMethod(m.id as any)}
+                  onClick={() => setPaymentMethod(m.id)}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     isSelected
                       ? 'bg-[#415344] text-white border-[#415344] shadow-xs ring-1 ring-[#c5a059]'
                       : 'bg-[#faf8f5] hover:bg-[#f0eae1] text-[#3e3831] border-[#d8ccbc]'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 mb-2 ${isSelected ? 'text-[#ebd8b1]' : 'text-[#8e5d43]'}`} />
+                  <Icon
+                    className={`w-5 h-5 mb-2 ${isSelected ? 'text-[#ebd8b1]' : 'text-[#8e5d43]'}`}
+                  />
                   <span className="block text-xs font-bold mb-0.5">
                     {lang === 'es' ? m.labelEs : m.labelEn}
                   </span>
@@ -291,15 +344,21 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
             {paymentMethod === 'transfer' && (
               <div>
                 <p className="font-semibold text-[#415344] mb-1">
-                  {lang === 'es' ? 'Datos bancarios para transferencia (Ecuador):' : 'Bank transfer coordinates:'}
+                  {lang === 'es'
+                    ? 'Datos bancarios para transferencia (Ecuador):'
+                    : 'Bank transfer coordinates:'}
                 </p>
-                <p>• <strong>{lang === 'es' ? 'Banco:' : 'Bank:'}</strong> Banco Pichincha ({lang === 'es' ? 'Cta Ahorros:' : 'Savings Acc:'} 2203426509)</p>
-                <p>• <strong>{lang === 'es' ? 'Titular:' : 'Account Holder:'}</strong> Lisett Morante Morales</p>
-                <p>• <strong>RUC / CI:</strong> 0927358887001</p>
-                <p>• <strong>{lang === 'es' ? 'Monto de abono (50%):' : 'Deposit Amount (50%):'}</strong> ${depositAmount} USD</p>
+                <BankTransferLines lang={lang} />
+                <p>
+                  •{' '}
+                  <strong>
+                    {lang === 'es' ? 'Monto de abono (50%):' : 'Deposit Amount (50%):'}
+                  </strong>{' '}
+                  ${depositAmount} USD
+                </p>
                 <p className="text-[11px] text-[#8e5d43] mt-1 italic">
                   {lang === 'es'
-                    ? 'Envía el comprobante a WhatsApp (+593 99 058 7684) para validación automática.'
+                    ? `Envía el comprobante a WhatsApp (${BRAND.whatsapp.display}) para validación automática.`
                     : 'Send transfer receipt via WhatsApp to finalize confirmation.'}
                 </p>
               </div>
@@ -308,14 +367,18 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
             {paymentMethod === 'card' && (
               <div>
                 <p className="font-semibold text-[#415344] mb-1">
-                  {lang === 'es' ? 'Pago seguro con tarjeta de crédito/débito:' : 'Secure card payment:'}
+                  {lang === 'es'
+                    ? 'Pago seguro con tarjeta de crédito/débito:'
+                    : 'Secure card payment:'}
                 </p>
                 <p>
                   {lang === 'es'
                     ? 'Recibirás un link seguro de pago (Datafast / Kushki) para procesar el abono de $' +
                       depositAmount +
                       ' USD en 1 cuota corriente o diferido.'
-                    : 'A secure payment link will be sent to complete your $' + depositAmount + ' USD deposit.'}
+                    : 'A secure payment link will be sent to complete your $' +
+                      depositAmount +
+                      ' USD deposit.'}
                 </p>
               </div>
             )}
@@ -343,49 +406,17 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-[#5a534b]">
-            <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#ede5d8]">
-              <strong className="text-[#2d2a26] block mb-0.5">
-                {lang === 'es' ? '✦ Reservas & Cupos Limitados' : '✦ Limited Reserved Spots'}
-              </strong>
-              <span>
-                {lang === 'es'
-                  ? 'Abono de confirmación del 50%. Reserva con anticipación.'
-                  : '50% confirmation deposit. Advance booking recommended.'}
-              </span>
-            </div>
-
-            <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#ede5d8]">
-              <strong className="text-[#2d2a26] block mb-0.5">
-                {lang === 'es' ? '✦ Cancelación Gratuita' : '✦ Free Cancellation'}
-              </strong>
-              <span>
-                {lang === 'es'
-                  ? 'Cancelación sin penalidad hasta 24 horas antes de tu sesión.'
-                  : 'Free cancellation up to 24 hours prior to appointment.'}
-              </span>
-            </div>
-
-            <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#ede5d8]">
-              <strong className="text-[#2d2a26] block mb-0.5">
-                {lang === 'es' ? '✦ Puntualidad & Ropa Cómoda' : '✦ Punctuality & Attire'}
-              </strong>
-              <span>
-                {lang === 'es'
-                  ? 'Llegar 10 minutos antes. Ropa cómoda (se provee cobertura higiénica).'
-                  : 'Arrive 10 min early. Comfortable clothing or draping provided.'}
-              </span>
-            </div>
-
-            <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#ede5d8]">
-              <strong className="text-[#2d2a26] block mb-0.5">
-                {lang === 'es' ? '✦ Cuidado Post-Sesión' : '✦ Post-Session Care'}
-              </strong>
-              <span>
-                {lang === 'es'
-                  ? 'Hidratación abundante post-sesión para drenar toxinas acumuladas.'
-                  : 'Abundant post-session hydration to assist toxin elimination.'}
-              </span>
-            </div>
+            {POLICIES.map((policy) => (
+              <div
+                key={policy.titleEs}
+                className="p-3 bg-[#faf8f5] rounded-xl border border-[#ede5d8]"
+              >
+                <strong className="text-[#2d2a26] block mb-0.5">
+                  {lang === 'es' ? policy.titleEs : policy.titleEn}
+                </strong>
+                <span>{lang === 'es' ? policy.bodyEs : policy.bodyEn}</span>
+              </div>
+            ))}
           </div>
 
           <label className="flex items-start gap-2.5 pt-2 cursor-pointer select-none">
@@ -411,14 +442,9 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
 
         {/* Action Buttons */}
         <div className="flex items-center justify-between gap-4 pt-2">
-          <button
-            type="button"
-            onClick={onBack}
-            className="px-5 py-3 rounded-xl border border-[#d8ccbc] bg-white hover:bg-[#f0eae1] text-[#4a453e] font-semibold text-sm flex items-center gap-2 transition-all shadow-xs"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{lang === 'es' ? 'Modificar Horario' : 'Back to Schedule'}</span>
-          </button>
+          <BackButton onClick={onBack}>
+            {lang === 'es' ? 'Modificar Horario' : 'Back to Schedule'}
+          </BackButton>
 
           <button
             type="submit"
@@ -432,8 +458,8 @@ export const ClientDetailsAndPayment: React.FC<ClientDetailsAndPaymentProps> = (
                   ? 'Sincronizando con Google Calendar...'
                   : 'Syncing with Google Calendar...'
                 : lang === 'es'
-                ? `Confirmar Reserva ($${depositAmount} USD Abono)`
-                : `Confirm Booking ($${depositAmount} USD Deposit)`}
+                  ? `Confirmar Reserva ($${depositAmount} USD Abono)`
+                  : `Confirm Booking ($${depositAmount} USD Deposit)`}
             </span>
           </button>
         </div>

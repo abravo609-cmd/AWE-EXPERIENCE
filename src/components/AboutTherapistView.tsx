@@ -6,20 +6,21 @@ import {
   ShieldCheck,
   Phone,
   Instagram,
-  MapPin,
   Calendar,
   CheckCircle2,
 } from 'lucide-react';
+import { Lang } from '../types/spa';
+import { BRAND, CREDENTIALS, whatsappUrl } from '../data/brand';
+
+/** Un icono por credencial, en el mismo orden que CREDENTIALS. */
+const CREDENTIAL_ICONS = [Award, ShieldCheck, Sparkles, Heart];
 
 interface AboutTherapistViewProps {
-  lang: 'es' | 'en';
+  lang: Lang;
   onBookNow: () => void;
 }
 
-export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
-  lang,
-  onBookNow,
-}) => {
+export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({ lang, onBookNow }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-10">
       {/* Hero Profile */}
@@ -30,12 +31,8 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-white">
-            Lisett Morante
+            {BRAND.therapist}
           </h2>
-
-          <p className="text-sm sm:text-base text-[#ebd8b1] font-serif italic">
-            "Tu cuerpo recuerda lo que tu mente olvidó."
-          </p>
 
           <p className="text-xs sm:text-sm text-[#d8dfd7] leading-relaxed font-light">
             {lang === 'es'
@@ -53,13 +50,13 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
             </button>
 
             <a
-              href="https://wa.me/593990587684"
+              href={whatsappUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-xs sm:text-sm transition-all flex items-center gap-2"
             >
               <Phone className="w-4 h-4 text-[#ebd8b1]" />
-              <span>WhatsApp: +593 99 058 7684</span>
+              <span>WhatsApp: {BRAND.whatsapp.display}</span>
             </a>
           </div>
         </div>
@@ -67,29 +64,8 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
 
       {/* Credentials Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {[
-          {
-            title: 'Licenciada en Hotelería & Turismo',
-            desc: 'Formación académica integral en hospitalidad de alta gama y gestión de experiencias memorables.',
-            icon: Award,
-          },
-          {
-            title: 'Spa & Wellness Manager Certificada',
-            desc: 'Especialista en estándares de spas internacionales 5 estrellas y protocolos clínicos de cuidado.',
-            icon: ShieldCheck,
-          },
-          {
-            title: '+14 Años en Bienestar de Lujo',
-            desc: 'Amplia trayectoria guiando procesos de restauración física, sensorial y nerviosa en centros de prestigio.',
-            icon: Sparkles,
-          },
-          {
-            title: 'Terapeuta Holística & Energética',
-            desc: 'Certificada en Barras de Access, Quirotermia, Kobido facial japonés ancestral, reflexología y medicina herbal andina.',
-            icon: Heart,
-          },
-        ].map((c, i) => {
-          const Icon = c.icon;
+        {CREDENTIALS.map((c, i) => {
+          const Icon = CREDENTIAL_ICONS[i];
           return (
             <div
               key={i}
@@ -98,12 +74,8 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
               <div className="w-10 h-10 rounded-xl bg-[#faf7f2] border border-[#ede5d8] text-[#415344] flex items-center justify-center">
                 <Icon className="w-5 h-5 text-[#8e5d43]" />
               </div>
-              <h4 className="text-sm font-serif font-bold text-[#2d2a26]">
-                {c.title}
-              </h4>
-              <p className="text-xs text-[#6e665d] leading-relaxed">
-                {c.desc}
-              </p>
+              <h4 className="text-sm font-serif font-bold text-[#2d2a26]">{c.title}</h4>
+              <p className="text-xs text-[#6e665d] leading-relaxed">{c.desc}</p>
             </div>
           );
         })}
@@ -115,7 +87,10 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
           ✦ La Filosofía de AWE SPA ✦
         </h3>
         <p className="text-xs sm:text-sm text-[#4a453e] leading-relaxed text-center max-w-2xl mx-auto font-light">
-          "Donde la sabiduría ancestral sana el ser moderno. Cada persona que llega a nuestra camilla carga una historia en su cuello, en su espalda, en sus pies. No realizamos masajes genéricos: evaluamos restricciones, cirugías previas, posibles contraindicaciones y la intención de tu alma para devolverte a tu centro."
+          "{BRAND.motto} Cada persona que llega a nuestra camilla carga una historia en su cuello,
+          en su espalda, en sus pies. No realizamos masajes genéricos: evaluamos restricciones,
+          cirugías previas, posibles contraindicaciones y la intención de tu alma para devolverte a
+          tu centro."
         </p>
 
         <div className="pt-4 border-t border-[#e2d7c5] flex flex-wrap items-center justify-center gap-6 text-xs text-[#524c44]">
@@ -144,22 +119,22 @@ export const AboutTherapistView: React.FC<AboutTherapistViewProps> = ({
         </p>
         <div className="flex flex-wrap justify-center gap-4 text-xs font-semibold text-[#415344] pt-2">
           <a
-            href="https://wa.me/593990587684"
+            href={whatsappUrl()}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#faf7f2] border border-[#ede5d8] hover:bg-[#ede5d8] transition-colors"
           >
             <Phone className="w-4 h-4 text-[#8e5d43]" />
-            <span>+593 99 058 7684</span>
+            <span>{BRAND.whatsapp.display}</span>
           </a>
           <a
-            href="https://instagram.com"
+            href={BRAND.instagram.url}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#faf7f2] border border-[#ede5d8] hover:bg-[#ede5d8] transition-colors"
           >
             <Instagram className="w-4 h-4 text-[#8e5d43]" />
-            <span>@lisettmorante.awe</span>
+            <span>{BRAND.instagram.handle}</span>
           </a>
         </div>
       </div>
